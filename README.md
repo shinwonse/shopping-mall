@@ -15,42 +15,42 @@
 설치 이후에 `yarn dev`로 서버를 작동해보면 `routes.tsx` 파일 생성됨
 
 ```typescript
+import React from "react";
+import GlobalLayout from "./pages/_layout";
 
-import React from 'react';
-import GlobalLayout from './pages/_layout'
-
-const DynamicIndex = React.lazy(() => import('./pages/index'));
-const DynamicProductsIndex = React.lazy(() => import('./pages/products/index'));
-const DynamicProductsId = React.lazy(() => import('./pages/products/[id]'));
-
+const DynamicIndex = React.lazy(() => import("./pages/index"));
+const DynamicProductsIndex = React.lazy(() => import("./pages/products/index"));
+const DynamicProductsId = React.lazy(() => import("./pages/products/[id]"));
 
 export const routes = [
   {
-    path: '/',
+    path: "/",
     element: <GlobalLayout />,
     children: [
-      { path: '/', element: <DynamicIndex />, index: true},
-      { path: '/products', element: <DynamicProductsIndex />, index: true},
-      { path: '/products/:id', element: <DynamicProductsId />, },
-    ]
-  }
-]
+      { path: "/", element: <DynamicIndex />, index: true },
+      { path: "/products", element: <DynamicProductsIndex />, index: true },
+      { path: "/products/:id", element: <DynamicProductsId /> },
+    ],
+  },
+];
 
 export const pages = [
-  { route: '/' },
-  { route: '/products' },
-  { route: '/products/:id' },
-]
-
+  { route: "/" },
+  { route: "/products" },
+  { route: "/products/:id" },
+];
 ```
 
 ## 2. 상품 페이지 만들기
+
 https://fakestoreapi.com/ 를 이용하여 상품 페이지를 구현하도록 함
 
 #### 2.1 react-query 사용하기
+
 `app.tsx`에 `QueryClientProvider` 와 `ReactQueryDevtools` 작성
 
 그리고 다음과 같이 `queryClient.ts`를 작성함
+
 ```typescript
 import {
   useQuery,
@@ -105,11 +105,13 @@ export const QueryKeys = {
   PRODUCTS: "PRODUCTS",
 };
 ```
+
 `fetcher` 작성을 유의깊게 볼 것
 
 #### 2.2 스타일은 간단하게 Sass로
 
 #### 2.3 상품상세 페이지
+
 ```typescript
 export const fetcher = async ({
   method,
@@ -146,6 +148,7 @@ export const fetcher = async ({
   }
 };
 ```
+
 `fetcher` 함수에 위와 같이 `params` 조건 추가
 
 ```typescript
@@ -176,9 +179,11 @@ const ProductDetailPage = () => {
 
 export default ProductDetailPage;
 ```
+
 위와 같이 `params`로 넘어온 id를 키 배열에 추가하여 제품 하나의 정보만 가져올 수 있음
 
 #### react-query cache 정책
+
 ```typescript
 export const getClient = (() => {
   let client: QueryClient | null = null;
@@ -199,6 +204,9 @@ export const getClient = (() => {
   };
 })();
 ```
+
 `react-query`는 여러가지 옵션을 제공하는데 그 중 `cacheTime`을 설정할 수 있음. 이를 통해 같은 쿼리 키로 불러오는 데이터들을 여러번 `useQuery`로 불러오더라도 이미 요청했어서 캐시가 남아있으면 더 이상 불러오지 않아서 효율적.
 
+## 3. mock API로 데이터통신 준비하기
 
+### 3.1 GraphQL 사용해보기
