@@ -209,4 +209,58 @@ export const getClient = (() => {
 
 ## 3. mock API로 데이터통신 준비하기
 
-### 3.1 GraphQL 사용해보기
+### 3.1 msw 세팅하기
+
+```typescript
+import { graphql } from "msw";
+import GET_PRODUCTS, { GET_PRODUCT } from "../graphql/products";
+import { v4 as uuid } from "uuid";
+
+const mockProducts = Array.from({ length: 20 }).map((_, i) => ({
+  id: uuid(),
+  imageUrl: `https://placeimg.com/200/150/${i + 1}`,
+  price: 50000,
+  title: `임시상품${i + 1}`,
+  description: `임시상세내용${i + 1}`,
+  createdAt: new Date(1645735501883 + i * 1000 * 60 * 60 * 10).toString(),
+}));
+
+export const handlers = [
+  graphql.query(GET_PRODUCTS, (req, res, ctx) => {
+    return res(
+      ctx.data({
+        products: mockProducts,
+      })
+    );
+  }),
+  graphql.query(GET_PRODUCT, (req, res, ctx) => {
+    return res(ctx.data(mockProducts[0]));
+  }),
+];
+```
+
+위와 같이 `handler` 작성
+
+### 3.2 GraphQL 사용해보기
+
+기존에 있던 `types.ts`파일을 삭제하고 따로 `graphql/products.ts`파일 생성
+`queryClient`를 아래와 같이 작성
+
+```typescript
+export const graphqlFetcher = (query: RequestDocument, variables = {}) =>
+  request(BASE_URL, query, variables);
+
+export const QueryKeys = {
+  PRODUCTS: "PRODUCTS",
+};
+```
+
+### 3.3 데이터 불러오기
+
+```typescript
+const { data } = useQuery<Products>(QueryKeys.PRODUCTS, () =>
+  graphqlFetcher(GET_PRODUCTS)
+);
+```
+
+위처럼 데이터를 불러올 수 있음
