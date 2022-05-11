@@ -264,3 +264,39 @@ const { data } = useQuery<Products>(QueryKeys.PRODUCTS, () =>
 ```
 
 위처럼 데이터를 불러올 수 있음
+
+### 3.4 장바구니 mocking하기
+
+상태 관리를 위해 `recoil`도입
+
+```typescript
+import { atom, selectorFamily, useRecoilValue } from "recoil";
+
+// map 객체에 대해서 알아보자!
+// 타입은 number이거나 undefined이거나
+const cartState = atom<Map<string, number>>({
+  key: "cartState",
+  default: new Map(),
+});
+
+export const cartItemSelector = selectorFamily<number | undefined, string>({
+  key: "cartItem",
+  get:
+    (id: string) =>
+    ({ get }) => {
+      const carts = get(cartState);
+      return carts.get(id);
+    },
+  set:
+    (id: string) =>
+    ({ get, set }, newValue) => {
+      if (typeof newValue === "number") {
+        const newCart = new Map([...get(cartState)]);
+        newCart.set(id, newValue);
+        set(cartState, newCart);
+      }
+    },
+});
+```
+
+id에 따라 장바구니의 상태를 불러오거나 상태를 업데이트할 수 있는 코드 작성
