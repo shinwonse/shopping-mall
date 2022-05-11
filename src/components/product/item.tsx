@@ -15,6 +15,7 @@ const ProductItem = ({
       <img className="product-item__image" src={imageUrl} />
       <span className="product-item__price">${price}</span>
     </Link>
+    <button className="product-item__add-cart">담기</button>
   </li>
 );
 
